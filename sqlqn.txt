@@ -1,0 +1,20 @@
+#sql qn no 2
+
+create view top2 as
+(select product_catalogue.cat_id, product_catalogue.product_id,  
+DENSE_RANK() over ( partition by product_catalogue.cat_id order by purchase_history.Bill_date desc) trending
+from product_catalogue
+left join purchase_history
+on purchase_history.Product_Id = product_catalogue.product_id 
+);
+select * from top2;
+
+SELECT *
+FROM   top2 s
+WHERE 
+        (
+            SELECT  COUNT(*) 
+            FROM    top2 f
+            WHERE f.cat_id = s.cat_id AND 
+                  f.trending <= s.trending
+        ) <= 3;
